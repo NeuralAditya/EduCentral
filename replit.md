@@ -2,7 +2,7 @@
 
 ## Overview
 
-EduCentral is a comprehensive educational assessment platform that provides AI-powered mock tests with support for multiple question types including video responses, photo submissions, multiple-choice questions, and text-based answers. The platform features real-time assessment using OpenAI's API for intelligent feedback and scoring.
+EduCentral is a modular educational platform combining AI-powered assessment with gamified learning. The platform features two main modes accessible from the home page: (1) Learn & Practice - a gamified learning system for DSA, algorithms, and programming concepts with XP, badges, and progress tracking, and (2) Test & Assess - AI-powered mock tests with video/photo/text assessment capabilities for comprehensive evaluation.
 
 ## User Preferences
 
@@ -33,10 +33,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Key Components
 
-### Authentication & User Management
-- Role-based access (student/educator)
-- User session management
-- PostgreSQL-based user storage
+### Home Page & Navigation
+- **Mode Selection**: Users choose between "Learn & Practice" and "Test & Assess" modes
+- **Feature Overview**: Highlighting gamified learning and AI assessment capabilities
+- **Responsive Design**: Modern gradient-based UI with clear navigation paths
+
+### Gamified Learning System
+- **Learning Modules**: Categorized content for DSA, algorithms, and data structures
+- **XP & Leveling**: Experience points system with level progression (1000 XP per level)
+- **Badge System**: Achievements and badges for milestones and consistent learning
+- **Streak Tracking**: Daily learning streak maintenance with visual feedback
+- **Progress Analytics**: Module completion tracking and personal statistics
+- **Lesson Types**: Theory, practice, and challenge-based learning content
+- **Unlock System**: Sequential lesson unlocking based on prerequisite completion
 
 ### Test Management System
 - **Test Creation**: Educators can create tests with multiple question types
@@ -82,7 +91,11 @@ Preferred communication style: Simple, everyday language.
 - **Tests**: Test metadata, questions, and configuration
 - **Attempts**: Test session tracking and completion status
 - **Answers**: Individual responses with AI assessment results
-- **Analytics**: Performance metrics and user statistics
+- **Learning Modules**: Categorized learning content with difficulty levels
+- **Lessons**: Sequential learning content with XP rewards and unlock conditions
+- **User Progress**: Lesson completion tracking and time spent analytics
+- **User Stats**: XP totals, levels, streaks, badges, and achievements
+- **Analytics**: Performance metrics and learning statistics
 
 ## External Dependencies
 

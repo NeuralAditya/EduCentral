@@ -4,6 +4,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Navbar from "@/components/navbar";
+import Home from "@/pages/home";
+import Learn from "@/pages/learn";
+import Module from "@/pages/module";
 import Dashboard from "@/pages/dashboard";
 import TakeTest from "@/pages/take-test";
 import CreateTest from "@/pages/create-test";
@@ -12,19 +15,17 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <Navbar />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Switch>
-          <Route path="/" component={Dashboard} />
-          <Route path="/take-test" component={TakeTest} />
-          <Route path="/take-test/:testId" component={TakeTest} />
-          <Route path="/create-test" component={CreateTest} />
-          <Route path="/results" component={Results} />
-          <Route component={NotFound} />
-        </Switch>
-      </main>
-    </div>
+    <Switch>
+      <Route path="/" component={Home} />
+      <Route path="/learn" component={Learn} />
+      <Route path="/learn/module/:id" component={Module} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/take-test" component={TakeTest} />
+      <Route path="/take-test/:testId" component={TakeTest} />
+      <Route path="/create-test" component={CreateTest} />
+      <Route path="/results" component={Results} />
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
@@ -32,8 +33,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Router />
+        <div className="min-h-screen">
+          <Toaster />
+          <Router />
+        </div>
       </TooltipProvider>
     </QueryClientProvider>
   );

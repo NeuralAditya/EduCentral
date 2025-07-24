@@ -1,4 +1,4 @@
-import { users, tests, questions, testAttempts, answers, type User, type InsertUser, type Test, type InsertTest, type Question, type InsertQuestion, type TestAttempt, type InsertTestAttempt, type Answer, type InsertAnswer, type TestWithQuestions, type AttemptWithDetails } from "@shared/schema";
+import { users, tests, questions, testAttempts, answers, learningModules, lessons, userProgress, userStats, type User, type InsertUser, type Test, type InsertTest, type Question, type InsertQuestion, type TestAttempt, type InsertTestAttempt, type Answer, type InsertAnswer, type LearningModule, type InsertLearningModule, type Lesson, type InsertLesson, type UserProgress, type InsertUserProgress, type UserStats, type InsertUserStats, type TestWithQuestions, type AttemptWithDetails, type ModuleWithLessons, type LessonWithProgress } from "@shared/schema";
 
 export interface IStorage {
   // User operations
@@ -42,6 +42,31 @@ export interface IStorage {
     totalStudyTime: number;
     rank: number;
   }>;
+
+  // Learning module operations
+  getLearningModule(id: number): Promise<LearningModule | undefined>;
+  getModuleWithLessons(id: number): Promise<ModuleWithLessons | undefined>;
+  getPublishedModules(): Promise<LearningModule[]>;
+  createLearningModule(module: InsertLearningModule): Promise<LearningModule>;
+  updateLearningModule(id: number, module: Partial<LearningModule>): Promise<LearningModule | undefined>;
+
+  // Lesson operations
+  getLesson(id: number): Promise<Lesson | undefined>;
+  getLessonsByModule(moduleId: number): Promise<Lesson[]>;
+  createLesson(lesson: InsertLesson): Promise<Lesson>;
+  updateLesson(id: number, lesson: Partial<Lesson>): Promise<Lesson | undefined>;
+
+  // User progress operations
+  getUserProgress(userId: number, lessonId: number): Promise<UserProgress | undefined>;
+  getUserModuleProgress(userId: number, moduleId: number): Promise<UserProgress[]>;
+  createUserProgress(progress: InsertUserProgress): Promise<UserProgress>;
+  updateUserProgress(id: number, progress: Partial<UserProgress>): Promise<UserProgress | undefined>;
+
+  // User stats operations
+  getUserGameStats(userId: number): Promise<UserStats | undefined>;
+  createOrUpdateUserStats(userId: number, stats: Partial<InsertUserStats>): Promise<UserStats>;
+  addXpToUser(userId: number, xp: number): Promise<UserStats | undefined>;
+  updateUserStreak(userId: number): Promise<UserStats | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -50,12 +75,20 @@ export class MemStorage implements IStorage {
   private questions: Map<number, Question>;
   private testAttempts: Map<number, TestAttempt>;
   private answers: Map<number, Answer>;
+  private learningModules: Map<number, LearningModule>;
+  private lessons: Map<number, Lesson>;
+  private userProgress: Map<number, UserProgress>;
+  private userStatsMap: Map<number, UserStats>;
   private currentIds: {
     user: number;
     test: number;
     question: number;
     testAttempt: number;
     answer: number;
+    learningModule: number;
+    lesson: number;
+    userProgress: number;
+    userStats: number;
   };
 
   constructor() {
@@ -64,12 +97,20 @@ export class MemStorage implements IStorage {
     this.questions = new Map();
     this.testAttempts = new Map();
     this.answers = new Map();
+    this.learningModules = new Map();
+    this.lessons = new Map();
+    this.userProgress = new Map();
+    this.userStatsMap = new Map();
     this.currentIds = {
       user: 1,
       test: 1,
       question: 1,
       testAttempt: 1,
       answer: 1,
+      learningModule: 1,
+      lesson: 1,
+      userProgress: 1,
+      userStats: 1,
     };
 
     // Initialize with sample data
@@ -169,6 +210,84 @@ export class MemStorage implements IStorage {
     ];
 
     questions.forEach(q => this.questions.set(q.id, q as Question));
+
+    // Create sample learning modules
+    const dsaModule: LearningModule = {
+      id: this.currentIds.learningModule++,
+      title: "Data Structures & Algorithms Fundamentals",
+      description: "Master the building blocks of efficient programming",
+      category: "dsa",
+      difficulty: "beginner",
+      totalLessons: 8,
+      estimatedTime: 240,
+      xpReward: 500,
+      isPublished: true,
+      createdAt: new Date(),
+    };
+    this.learningModules.set(dsaModule.id, dsaModule);
+
+    const algorithmsModule: LearningModule = {
+      id: this.currentIds.learningModule++,
+      title: "Advanced Algorithms & Problem Solving",
+      description: "Dive deep into algorithmic thinking and optimization",
+      category: "algorithms",
+      difficulty: "intermediate",
+      totalLessons: 12,
+      estimatedTime: 360,
+      xpReward: 800,
+      isPublished: true,
+      createdAt: new Date(),
+    };
+    this.learningModules.set(algorithmsModule.id, algorithmsModule);
+
+    // Create sample lessons for DSA module
+    const dsaLessons = [
+      {
+        id: this.currentIds.lesson++,
+        moduleId: dsaModule.id,
+        title: "Introduction to Arrays",
+        content: "Learn about arrays, the fundamental data structure for storing collections of elements.",
+        lessonType: "theory",
+        orderIndex: 1,
+        xpReward: 50,
+        unlockCondition: null,
+      },
+      {
+        id: this.currentIds.lesson++,
+        moduleId: dsaModule.id,
+        title: "Array Operations Challenge",
+        content: "Practice implementing common array operations like search, insert, and delete.",
+        lessonType: "practice",
+        orderIndex: 2,
+        xpReward: 75,
+        unlockCondition: { prerequisite: this.currentIds.lesson - 1 },
+      },
+      {
+        id: this.currentIds.lesson++,
+        moduleId: dsaModule.id,
+        title: "Linked Lists Fundamentals",
+        content: "Understand linked lists and their advantages over arrays.",
+        lessonType: "theory",
+        orderIndex: 3,
+        xpReward: 60,
+        unlockCondition: { prerequisite: this.currentIds.lesson - 1 },
+      },
+    ];
+
+    dsaLessons.forEach(lesson => this.lessons.set(lesson.id, lesson as Lesson));
+
+    // Create sample user stats
+    const sampleUserStats: UserStats = {
+      id: this.currentIds.userStats++,
+      userId: sampleUser.id,
+      totalXp: 150,
+      level: 2,
+      streak: 3,
+      lastActiveDate: new Date(),
+      badges: ["first_lesson", "quick_learner"],
+      achievements: ["completed_first_module"],
+    };
+    this.userStatsMap.set(sampleUser.id, sampleUserStats);
   }
 
   // User operations
@@ -388,6 +507,172 @@ export class MemStorage implements IStorage {
       totalStudyTime: Math.floor(totalStudyTime / 3600), // Convert to hours
       rank,
     };
+  }
+
+  // Learning module operations
+  async getLearningModule(id: number): Promise<LearningModule | undefined> {
+    return this.learningModules.get(id);
+  }
+
+  async getModuleWithLessons(id: number): Promise<ModuleWithLessons | undefined> {
+    const module = this.learningModules.get(id);
+    if (!module) return undefined;
+
+    const lessons = Array.from(this.lessons.values())
+      .filter(lesson => lesson.moduleId === id)
+      .sort((a, b) => a.orderIndex - b.orderIndex);
+
+    return { ...module, lessons };
+  }
+
+  async getPublishedModules(): Promise<LearningModule[]> {
+    return Array.from(this.learningModules.values())
+      .filter(module => module.isPublished)
+      .sort((a, b) => a.id - b.id);
+  }
+
+  async createLearningModule(module: InsertLearningModule): Promise<LearningModule> {
+    const newModule: LearningModule = {
+      ...module,
+      id: this.currentIds.learningModule++,
+      createdAt: new Date(),
+    };
+    this.learningModules.set(newModule.id, newModule);
+    return newModule;
+  }
+
+  async updateLearningModule(id: number, module: Partial<LearningModule>): Promise<LearningModule | undefined> {
+    const existing = this.learningModules.get(id);
+    if (!existing) return undefined;
+
+    const updated = { ...existing, ...module };
+    this.learningModules.set(id, updated);
+    return updated;
+  }
+
+  // Lesson operations
+  async getLesson(id: number): Promise<Lesson | undefined> {
+    return this.lessons.get(id);
+  }
+
+  async getLessonsByModule(moduleId: number): Promise<Lesson[]> {
+    return Array.from(this.lessons.values())
+      .filter(lesson => lesson.moduleId === moduleId)
+      .sort((a, b) => a.orderIndex - b.orderIndex);
+  }
+
+  async createLesson(lesson: InsertLesson): Promise<Lesson> {
+    const newLesson: Lesson = {
+      ...lesson,
+      id: this.currentIds.lesson++,
+    };
+    this.lessons.set(newLesson.id, newLesson);
+    return newLesson;
+  }
+
+  async updateLesson(id: number, lesson: Partial<Lesson>): Promise<Lesson | undefined> {
+    const existing = this.lessons.get(id);
+    if (!existing) return undefined;
+
+    const updated = { ...existing, ...lesson };
+    this.lessons.set(id, updated);
+    return updated;
+  }
+
+  // User progress operations
+  async getUserProgress(userId: number, lessonId: number): Promise<UserProgress | undefined> {
+    return Array.from(this.userProgress.values())
+      .find(progress => progress.userId === userId && progress.lessonId === lessonId);
+  }
+
+  async getUserModuleProgress(userId: number, moduleId: number): Promise<UserProgress[]> {
+    return Array.from(this.userProgress.values())
+      .filter(progress => progress.userId === userId && progress.moduleId === moduleId);
+  }
+
+  async createUserProgress(progress: InsertUserProgress): Promise<UserProgress> {
+    const newProgress: UserProgress = {
+      ...progress,
+      id: this.currentIds.userProgress++,
+    };
+    this.userProgress.set(newProgress.id, newProgress);
+    return newProgress;
+  }
+
+  async updateUserProgress(id: number, progress: Partial<UserProgress>): Promise<UserProgress | undefined> {
+    const existing = this.userProgress.get(id);
+    if (!existing) return undefined;
+
+    const updated = { ...existing, ...progress };
+    this.userProgress.set(id, updated);
+    return updated;
+  }
+
+  // User stats operations
+  async getUserGameStats(userId: number): Promise<UserStats | undefined> {
+    return this.userStatsMap.get(userId);
+  }
+
+  async createOrUpdateUserStats(userId: number, stats: Partial<InsertUserStats>): Promise<UserStats> {
+    const existing = this.userStatsMap.get(userId);
+    
+    if (existing) {
+      const updated = { ...existing, ...stats };
+      this.userStatsMap.set(userId, updated);
+      return updated;
+    } else {
+      const newStats: UserStats = {
+        id: this.currentIds.userStats++,
+        userId,
+        totalXp: 0,
+        level: 1,
+        streak: 0,
+        lastActiveDate: new Date(),
+        badges: [],
+        achievements: [],
+        ...stats,
+      };
+      this.userStatsMap.set(userId, newStats);
+      return newStats;
+    }
+  }
+
+  async addXpToUser(userId: number, xp: number): Promise<UserStats | undefined> {
+    const stats = await this.getUserGameStats(userId);
+    if (!stats) return undefined;
+
+    const newXp = stats.totalXp + xp;
+    const newLevel = Math.floor(newXp / 1000) + 1; // 1000 XP per level
+
+    return this.createOrUpdateUserStats(userId, {
+      totalXp: newXp,
+      level: newLevel,
+    });
+  }
+
+  async updateUserStreak(userId: number): Promise<UserStats | undefined> {
+    const stats = await this.getUserGameStats(userId);
+    if (!stats) return undefined;
+
+    const today = new Date();
+    const lastActive = stats.lastActiveDate ? new Date(stats.lastActiveDate) : null;
+    
+    let newStreak = stats.streak;
+    if (lastActive) {
+      const diffDays = Math.floor((today.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24));
+      if (diffDays === 1) {
+        newStreak += 1;
+      } else if (diffDays > 1) {
+        newStreak = 1;
+      }
+    } else {
+      newStreak = 1;
+    }
+
+    return this.createOrUpdateUserStats(userId, {
+      streak: newStreak,
+      lastActiveDate: today,
+    });
   }
 }
 
