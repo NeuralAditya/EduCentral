@@ -85,11 +85,18 @@ export default function Home() {
                       <span>Detailed Feedback</span>
                     </div>
                   </div>
-                  <Link href="/dashboard">
-                    <Button size="lg" className="w-full bg-accent hover:bg-orange-700 text-white">
-                      Take Assessment Tests
-                    </Button>
-                  </Link>
+                  <div className="flex gap-3">
+                    <Link href="/dashboard" className="flex-1">
+                      <Button size="lg" className="w-full bg-accent hover:bg-orange-700 text-white">
+                        AI Assessment
+                      </Button>
+                    </Link>
+                    <Link href="/quiz/topics" className="flex-1">
+                      <Button size="lg" variant="outline" className="w-full border-orange-300 text-orange-700 hover:bg-orange-50">
+                        Quiz Challenge
+                      </Button>
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             </div>

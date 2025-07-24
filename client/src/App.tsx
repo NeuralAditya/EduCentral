@@ -12,6 +12,10 @@ import TakeTest from "@/pages/take-test";
 import EnhancedTest from "@/pages/enhanced-test";
 import CreateTest from "@/pages/create-test";
 import Results from "@/pages/results";
+import QuizTopics from "@/pages/quiz-topics";
+import TopicLevels from "@/pages/topic-levels";
+import QuizTake from "@/pages/quiz-take";
+import QuizResults from "@/pages/quiz-results";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +30,10 @@ function Router() {
       <Route path="/enhanced-test/:testId" component={EnhancedTest} />
       <Route path="/create-test" component={CreateTest} />
       <Route path="/results" component={Results} />
+      <Route path="/quiz/topics" component={QuizTopics} />
+      <Route path="/quiz/topic/:topicId" component={TopicLevels} />
+      <Route path="/quiz/:quizId" component={QuizTake} />
+      <Route path="/quiz/:quizId/results" component={QuizResults} />
       <Route component={NotFound} />
     </Switch>
   );

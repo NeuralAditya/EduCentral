@@ -450,6 +450,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register enhanced assessment routes
   registerEnhancedAssessmentRoutes(app);
 
+  // Quiz routes
+  app.use("/api/quiz", (await import("./routes/quiz")).default);
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -11,6 +11,30 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const topics = pgTable("topics", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  icon: text("icon"), // Icon name for UI
+  color: text("color"), // Theme color
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const quizzes = pgTable("quizzes", {
+  id: serial("id").primaryKey(),
+  topicId: integer("topic_id").references(() => topics.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  level: text("level").notNull(), // beginner, intermediate, advanced
+  totalQuestions: integer("total_questions").default(10),
+  timeLimit: integer("time_limit"), // in minutes
+  passingScore: integer("passing_score").default(70), // percentage
+  pointsPerQuestion: integer("points_per_question").default(10),
+  isPublished: boolean("is_published").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const tests = pgTable("tests", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -21,6 +45,17 @@ export const tests = pgTable("tests", {
   createdBy: integer("created_by").references(() => users.id),
   isPublished: boolean("is_published").default(false),
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const quizQuestions = pgTable("quiz_questions", {
+  id: serial("id").primaryKey(),
+  quizId: integer("quiz_id").references(() => quizzes.id),
+  question: text("question").notNull(),
+  options: jsonb("options").notNull(), // Array of options for MCQ
+  correctAnswer: text("correct_answer").notNull(),
+  explanation: text("explanation"), // Explanation for the correct answer
+  difficulty: text("difficulty").default("medium"), // easy, medium, hard
+  orderIndex: integer("order_index").notNull(),
 });
 
 export const questions = pgTable("questions", {
@@ -97,6 +132,55 @@ export const userProgress = pgTable("user_progress", {
   completedAt: timestamp("completed_at"),
 });
 
+export const quizAttempts = pgTable("quiz_attempts", {
+  id: serial("id").primaryKey(),
+  quizId: integer("quiz_id").references(() => quizzes.id),
+  userId: integer("user_id").references(() => users.id),
+  score: integer("score").default(0), // Score achieved
+  totalQuestions: integer("total_questions").notNull(),
+  correctAnswers: integer("correct_answers").default(0),
+  timeSpent: integer("time_spent"), // in seconds
+  completedAt: timestamp("completed_at").defaultNow(),
+  answers: jsonb("answers"), // Array of user answers with explanations
+});
+
+export const topicProgress = pgTable("topic_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  topicId: integer("topic_id").references(() => topics.id),
+  currentLevel: text("current_level").default("beginner"), // beginner, intermediate, advanced
+  totalPoints: integer("total_points").default(0),
+  quizzesCompleted: integer("quizzes_completed").default(0),
+  bestScore: integer("best_score").default(0),
+  lastActivityAt: timestamp("last_activity_at").defaultNow(),
+});
+
+export const badges = pgTable("badges", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  icon: text("icon"),
+  color: text("color"),
+  requirement: jsonb("requirement"), // Badge unlock criteria
+  points: integer("points").default(0), // Points awarded for earning badge
+});
+
+export const userBadges = pgTable("user_badges", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  badgeId: integer("badge_id").references(() => badges.id),
+  earnedAt: timestamp("earned_at").defaultNow(),
+});
+
+export const leaderboard = pgTable("leaderboard", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  topicId: integer("topic_id").references(() => topics.id),
+  totalPoints: integer("total_points").default(0),
+  rank: integer("rank"),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
 export const userStats = pgTable("user_stats", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).unique(),
@@ -147,6 +231,44 @@ export const insertUserProgressSchema = createInsertSchema(userProgress).omit({
 
 export const insertUserStatsSchema = createInsertSchema(userStats).omit({
   id: true,
+});
+
+export const insertTopicSchema = createInsertSchema(topics).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertQuizSchema = createInsertSchema(quizzes).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertQuizQuestionSchema = createInsertSchema(quizQuestions).omit({
+  id: true,
+});
+
+export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).omit({
+  id: true,
+  completedAt: true,
+});
+
+export const insertTopicProgressSchema = createInsertSchema(topicProgress).omit({
+  id: true,
+  lastActivityAt: true,
+});
+
+export const insertBadgeSchema = createInsertSchema(badges).omit({
+  id: true,
+});
+
+export const insertUserBadgeSchema = createInsertSchema(userBadges).omit({
+  id: true,
+  earnedAt: true,
+});
+
+export const insertLeaderboardSchema = createInsertSchema(leaderboard).omit({
+  id: true,
+  lastUpdated: true,
 });
 
 // Types
