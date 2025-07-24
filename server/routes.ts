@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertTestSchema, insertQuestionSchema, insertTestAttemptSchema, insertAnswerSchema } from "@shared/schema";
 import { assessVideoResponse, assessPhotoSubmission, assessTextResponse, transcribeAudio } from "./services/openai";
+import { analyzeEmotionFromText, analyzeSpeechQuality, assessContentQuality } from "./services/huggingface";
+import { registerEnhancedAssessmentRoutes } from "./routes/enhanced-assessment";
 import multer from "multer";
 
 const upload = multer({ 
@@ -14,9 +16,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get dashboard data
   app.get("/api/dashboard/:userId", async (req, res) => {
     try {
-      const userId = parseInt(req.params.userId);
-      const stats = await storage.getUserStats(userId);
-      const recentAttempts = await storage.getAttemptsByUser(userId);
+      // For now, use demo user regardless of URL parameter
+      const demoUser = await storage.getUserByUsername("demo");
+      if (!demoUser) {
+        return res.status(404).json({ message: "Demo user not found" });
+      }
+      
+      const stats = await storage.getUserStats(demoUser.id);
+      const recentAttempts = await storage.getAttemptsByUser(demoUser.id);
       const availableTests = await storage.getPublishedTests();
 
       res.json({
@@ -368,12 +375,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/learning/stats", async (req, res) => {
     try {
-      // For now, assume user ID 1 (in a real app, get from session)
-      const userId = 1;
-      let stats = await storage.getUserGameStats(userId);
+      // Get the demo user
+      const demoUser = await storage.getUserByUsername("demo");
+      if (!demoUser) {
+        return res.status(404).json({ error: "Demo user not found" });
+      }
+      
+      let stats = await storage.getUserGameStats(demoUser.id);
       
       if (!stats) {
-        stats = await storage.createOrUpdateUserStats(userId, {
+        stats = await storage.createOrUpdateUserStats(demoUser.id, {
           totalXp: 0,
           level: 1,
           streak: 0,
@@ -435,6 +446,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch progress" });
     }
   });
+
+  // Register enhanced assessment routes
+  registerEnhancedAssessmentRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;

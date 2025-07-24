@@ -188,11 +188,18 @@ export default function Dashboard() {
                           <span className="text-xs text-neutral-600">AI Assessment Available</span>
                         </div>
                       </div>
-                      <Link href={`/take-test/${test.id}`}>
-                        <Button className="bg-primary hover:bg-blue-700">
-                          Start Test
-                        </Button>
-                      </Link>
+                      <div className="flex gap-2">
+                        <Link href={`/take-test/${test.id}`}>
+                          <Button variant="outline" size="sm">
+                            Standard
+                          </Button>
+                        </Link>
+                        <Link href={`/enhanced-test/${test.id}`}>
+                          <Button size="sm" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                            AI Enhanced
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ))}

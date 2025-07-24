@@ -9,6 +9,7 @@ import Learn from "@/pages/learn";
 import Module from "@/pages/module";
 import Dashboard from "@/pages/dashboard";
 import TakeTest from "@/pages/take-test";
+import EnhancedTest from "@/pages/enhanced-test";
 import CreateTest from "@/pages/create-test";
 import Results from "@/pages/results";
 import NotFound from "@/pages/not-found";
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/take-test" component={TakeTest} />
       <Route path="/take-test/:testId" component={TakeTest} />
+      <Route path="/enhanced-test/:testId" component={EnhancedTest} />
       <Route path="/create-test" component={CreateTest} />
       <Route path="/results" component={Results} />
       <Route component={NotFound} />

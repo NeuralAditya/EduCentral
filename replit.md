@@ -2,7 +2,7 @@
 
 ## Overview
 
-EduCentral is a modular educational platform combining AI-powered assessment with gamified learning. The platform features two main modes accessible from the home page: (1) Learn & Practice - a gamified learning system for DSA, algorithms, and programming concepts with XP, badges, and progress tracking, and (2) Test & Assess - AI-powered mock tests with video/photo/text assessment capabilities for comprehensive evaluation.
+EduCentral is a comprehensive educational platform featuring advanced AI-powered assessment and gamified learning. The platform offers: (1) Learn & Practice - a gamified learning system for DSA, algorithms, and programming concepts with XP, badges, and progress tracking, and (2) Enhanced AI Assessment - revolutionary testing with real-time webcam/microphone access, facial expression analysis using MediaPipe, speech-to-text conversion with HuggingFace APIs, emotion/confidence evaluation, and comprehensive performance reports combining content analysis with visual/audio feedback.
 
 ## User Preferences
 
@@ -55,12 +55,14 @@ Preferred communication style: Simple, everyday language.
 - **Test Configuration**: Duration limits, difficulty levels, subject categorization
 - **Publishing**: Draft/published states for test management
 
-### AI Assessment Engine
-- **OpenAI Integration**: GPT-4o model for intelligent assessment
-- **Video Assessment**: Transcription and evaluation of video responses
-- **Photo Assessment**: Image analysis for diagram accuracy and completeness
-- **Text Assessment**: Natural language processing for written responses
-- **Scoring Criteria**: Configurable AI criteria for different assessment types
+### Enhanced AI Assessment Engine
+- **OpenAI Integration**: GPT-4o model for intelligent content assessment
+- **HuggingFace Integration**: Free emotion analysis, sentiment analysis, and speech quality assessment
+- **MediaPipe Integration**: Real-time facial expression analysis and emotion detection
+- **Real-time Video Analysis**: Live webcam feed with facial expression tracking
+- **Speech-to-Text Conversion**: Browser-based speech recognition with tone analysis
+- **Multi-modal Assessment**: Combines content accuracy, delivery confidence, and emotional presentation
+- **Comprehensive Scoring**: Content (50%) + Emotion confidence (15%) + Speech clarity (20%) + Facial confidence (15%)
 
 ### Media Handling
 - **Video Recording**: Browser-based video capture with MediaRecorder API
