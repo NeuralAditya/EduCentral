@@ -1,4 +1,6 @@
 import { users, tests, questions, testAttempts, answers, learningModules, lessons, userProgress, userStats, type User, type InsertUser, type Test, type InsertTest, type Question, type InsertQuestion, type TestAttempt, type InsertTestAttempt, type Answer, type InsertAnswer, type LearningModule, type InsertLearningModule, type Lesson, type InsertLesson, type UserProgress, type InsertUserProgress, type UserStats, type InsertUserStats, type TestWithQuestions, type AttemptWithDetails, type ModuleWithLessons, type LessonWithProgress } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -10,22 +12,19 @@ export interface IStorage {
   getTest(id: number): Promise<Test | undefined>;
   getTestWithQuestions(id: number): Promise<TestWithQuestions | undefined>;
   getPublishedTests(): Promise<Test[]>;
-  getTestsByCreator(creatorId: number): Promise<Test[]>;
   createTest(test: InsertTest): Promise<Test>;
   updateTest(id: number, test: Partial<Test>): Promise<Test | undefined>;
-  deleteTest(id: number): Promise<boolean>;
 
   // Question operations
   getQuestion(id: number): Promise<Question | undefined>;
   getQuestionsByTest(testId: number): Promise<Question[]>;
   createQuestion(question: InsertQuestion): Promise<Question>;
   updateQuestion(id: number, question: Partial<Question>): Promise<Question | undefined>;
-  deleteQuestion(id: number): Promise<boolean>;
 
   // Test attempt operations
   getTestAttempt(id: number): Promise<TestAttempt | undefined>;
-  getAttemptWithDetails(id: number): Promise<AttemptWithDetails | undefined>;
   getAttemptsByUser(userId: number): Promise<TestAttempt[]>;
+  getAttemptWithDetails(id: number): Promise<AttemptWithDetails | undefined>;
   createTestAttempt(attempt: InsertTestAttempt): Promise<TestAttempt>;
   updateTestAttempt(id: number, attempt: Partial<TestAttempt>): Promise<TestAttempt | undefined>;
 
@@ -69,410 +68,308 @@ export interface IStorage {
   updateUserStreak(userId: number): Promise<UserStats | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private tests: Map<number, Test>;
-  private questions: Map<number, Question>;
-  private testAttempts: Map<number, TestAttempt>;
-  private answers: Map<number, Answer>;
-  private learningModules: Map<number, LearningModule>;
-  private lessons: Map<number, Lesson>;
-  private userProgress: Map<number, UserProgress>;
-  private userStatsMap: Map<number, UserStats>;
-  private currentIds: {
-    user: number;
-    test: number;
-    question: number;
-    testAttempt: number;
-    answer: number;
-    learningModule: number;
-    lesson: number;
-    userProgress: number;
-    userStats: number;
-  };
-
+export class DatabaseStorage implements IStorage {
   constructor() {
-    this.users = new Map();
-    this.tests = new Map();
-    this.questions = new Map();
-    this.testAttempts = new Map();
-    this.answers = new Map();
-    this.learningModules = new Map();
-    this.lessons = new Map();
-    this.userProgress = new Map();
-    this.userStatsMap = new Map();
-    this.currentIds = {
-      user: 1,
-      test: 1,
-      question: 1,
-      testAttempt: 1,
-      answer: 1,
-      learningModule: 1,
-      lesson: 1,
-      userProgress: 1,
-      userStats: 1,
-    };
-
-    // Initialize with sample data
+    // Initialize sample data if needed
     this.initializeSampleData();
   }
 
-  private initializeSampleData() {
-    // Create sample user
-    const sampleUser: User = {
-      id: this.currentIds.user++,
-      username: "john_doe",
-      password: "hashedpassword",
-      role: "student",
-      createdAt: new Date(),
-    };
-    this.users.set(sampleUser.id, sampleUser);
+  private async initializeSampleData() {
+    try {
+      // Check if data already exists
+      const existingUsers = await db.select().from(users).limit(1);
+      if (existingUsers.length > 0) return; // Data already exists
 
-    // Create sample educator
-    const educator: User = {
-      id: this.currentIds.user++,
-      username: "prof_smith",
-      password: "hashedpassword",
-      role: "educator",
-      createdAt: new Date(),
-    };
-    this.users.set(educator.id, educator);
+      // Create a sample user
+      const [sampleUser] = await db
+        .insert(users)
+        .values({
+          username: "demo",
+          email: "demo@example.com",
+          password: "demo123", // Add password for database constraint
+          role: "student",
+        })
+        .returning();
 
-    // Create sample tests
-    const physicsTest: Test = {
-      id: this.currentIds.test++,
-      title: "Physics Mock Exam",
-      description: "Comprehensive physics assessment with AI-powered evaluation",
-      subject: "Physics",
-      duration: 90,
-      difficulty: "intermediate",
-      createdBy: educator.id,
-      isPublished: true,
-      createdAt: new Date(),
-    };
-    this.tests.set(physicsTest.id, physicsTest);
+      // Create a sample test
+      const [sampleTest] = await db
+        .insert(tests)
+        .values({
+          title: "JavaScript Fundamentals Assessment",
+          description: "Test your knowledge of JavaScript basics including variables, functions, and control structures.",
+          duration: 30,
+          totalPoints: 100,
+          difficulty: "intermediate",
+          subject: "programming",
+          createdBy: sampleUser.id,
+          isPublished: true,
+        })
+        .returning();
 
-    const biologyTest: Test = {
-      id: this.currentIds.test++,
-      title: "Biology Assessment",
-      description: "Biology test with photo upload requirements",
-      subject: "Biology",
-      duration: 60,
-      difficulty: "beginner",
-      createdBy: educator.id,
-      isPublished: true,
-      createdAt: new Date(),
-    };
-    this.tests.set(biologyTest.id, biologyTest);
-
-    // Create sample questions
-    const questions = [
-      {
-        id: this.currentIds.question++,
-        testId: physicsTest.id,
-        type: "mcq",
-        question: "What is the acceleration due to gravity on Earth's surface approximately equal to?",
-        options: ["9.8 m/s²", "10.8 m/s²", "8.8 m/s²", "11.8 m/s²"],
-        correctAnswer: "9.8 m/s²",
-        points: 5,
-        timeLimit: 60,
-        aiCriteria: null,
-        orderIndex: 1,
-      },
-      {
-        id: this.currentIds.question++,
-        testId: physicsTest.id,
-        type: "video_response",
-        question: "Explain Newton's Third Law of Motion with a practical example. Record a 2-minute video response.",
-        options: null,
-        correctAnswer: null,
-        points: 10,
-        timeLimit: 180,
-        aiCriteria: {
-          criteria: ["Speech clarity", "Content accuracy", "Use of examples", "Presentation quality"]
+      // Create sample questions
+      await db.insert(questions).values([
+        {
+          testId: sampleTest.id,
+          type: "mcq",
+          question: "What is the correct way to declare a variable in JavaScript?",
+          options: ["var myVar;", "variable myVar;", "v myVar;", "declare myVar;"],
+          correctAnswer: "var myVar;",
+          points: 10,
+          orderIndex: 1,
         },
-        orderIndex: 2,
-      },
-      {
-        id: this.currentIds.question++,
-        testId: biologyTest.id,
-        type: "photo_upload",
-        question: "Draw and photograph a cell diagram showing organelles.",
-        options: null,
-        correctAnswer: null,
-        points: 8,
-        timeLimit: 300,
-        aiCriteria: {
-          criteria: ["Diagram accuracy", "Proper labeling", "Clarity", "Completeness"]
+        {
+          testId: sampleTest.id,
+          type: "video",
+          question: "Record a 2-minute video explaining the concept of JavaScript closures with examples.",
+          points: 30,
+          orderIndex: 2,
         },
-        orderIndex: 1,
-      },
-    ];
+        {
+          testId: sampleTest.id,
+          type: "photo",
+          question: "Draw and photograph a diagram showing the JavaScript event loop process.",
+          points: 25,
+          orderIndex: 3,
+        },
+        {
+          testId: sampleTest.id,
+          type: "text",
+          question: "Explain the difference between 'let', 'const', and 'var' in JavaScript. Provide examples for each.",
+          points: 35,
+          orderIndex: 4,
+        },
+      ]);
 
-    questions.forEach(q => this.questions.set(q.id, q as Question));
+      // Create sample learning modules
+      const [dsaModule] = await db
+        .insert(learningModules)
+        .values({
+          title: "Data Structures & Algorithms Fundamentals",
+          description: "Master the building blocks of efficient programming",
+          category: "dsa",
+          difficulty: "beginner",
+          totalLessons: 8,
+          estimatedTime: 240,
+          xpReward: 500,
+          isPublished: true,
+        })
+        .returning();
 
-    // Create sample learning modules
-    const dsaModule: LearningModule = {
-      id: this.currentIds.learningModule++,
-      title: "Data Structures & Algorithms Fundamentals",
-      description: "Master the building blocks of efficient programming",
-      category: "dsa",
-      difficulty: "beginner",
-      totalLessons: 8,
-      estimatedTime: 240,
-      xpReward: 500,
-      isPublished: true,
-      createdAt: new Date(),
-    };
-    this.learningModules.set(dsaModule.id, dsaModule);
+      const [algorithmsModule] = await db
+        .insert(learningModules)
+        .values({
+          title: "Advanced Algorithms & Problem Solving",
+          description: "Dive deep into algorithmic thinking and optimization",
+          category: "algorithms",
+          difficulty: "intermediate",
+          totalLessons: 12,
+          estimatedTime: 360,
+          xpReward: 800,
+          isPublished: true,
+        })
+        .returning();
 
-    const algorithmsModule: LearningModule = {
-      id: this.currentIds.learningModule++,
-      title: "Advanced Algorithms & Problem Solving",
-      description: "Dive deep into algorithmic thinking and optimization",
-      category: "algorithms",
-      difficulty: "intermediate",
-      totalLessons: 12,
-      estimatedTime: 360,
-      xpReward: 800,
-      isPublished: true,
-      createdAt: new Date(),
-    };
-    this.learningModules.set(algorithmsModule.id, algorithmsModule);
+      // Create sample lessons for DSA module
+      await db.insert(lessons).values([
+        {
+          moduleId: dsaModule.id,
+          title: "Introduction to Arrays",
+          content: "Learn about arrays, the fundamental data structure for storing collections of elements.",
+          lessonType: "theory",
+          orderIndex: 1,
+          xpReward: 50,
+          unlockCondition: null,
+        },
+        {
+          moduleId: dsaModule.id,
+          title: "Array Operations Challenge",
+          content: "Practice implementing common array operations like search, insert, and delete.",
+          lessonType: "practice",
+          orderIndex: 2,
+          xpReward: 75,
+          unlockCondition: { prerequisite: 1 },
+        },
+        {
+          moduleId: dsaModule.id,
+          title: "Linked Lists Fundamentals",
+          content: "Understand linked lists and their advantages over arrays.",
+          lessonType: "theory",
+          orderIndex: 3,
+          xpReward: 60,
+          unlockCondition: { prerequisite: 2 },
+        },
+      ]);
 
-    // Create sample lessons for DSA module
-    const dsaLessons = [
-      {
-        id: this.currentIds.lesson++,
-        moduleId: dsaModule.id,
-        title: "Introduction to Arrays",
-        content: "Learn about arrays, the fundamental data structure for storing collections of elements.",
-        lessonType: "theory",
-        orderIndex: 1,
-        xpReward: 50,
-        unlockCondition: null,
-      },
-      {
-        id: this.currentIds.lesson++,
-        moduleId: dsaModule.id,
-        title: "Array Operations Challenge",
-        content: "Practice implementing common array operations like search, insert, and delete.",
-        lessonType: "practice",
-        orderIndex: 2,
-        xpReward: 75,
-        unlockCondition: { prerequisite: this.currentIds.lesson - 1 },
-      },
-      {
-        id: this.currentIds.lesson++,
-        moduleId: dsaModule.id,
-        title: "Linked Lists Fundamentals",
-        content: "Understand linked lists and their advantages over arrays.",
-        lessonType: "theory",
-        orderIndex: 3,
-        xpReward: 60,
-        unlockCondition: { prerequisite: this.currentIds.lesson - 1 },
-      },
-    ];
+      // Create sample user stats
+      await db
+        .insert(userStats)
+        .values({
+          userId: sampleUser.id,
+          totalXp: 150,
+          level: 2,
+          streak: 3,
+          lastActiveDate: new Date(),
+          badges: ["first_lesson", "quick_learner"],
+          achievements: ["completed_first_module"],
+        });
 
-    dsaLessons.forEach(lesson => this.lessons.set(lesson.id, lesson as Lesson));
-
-    // Create sample user stats
-    const sampleUserStats: UserStats = {
-      id: this.currentIds.userStats++,
-      userId: sampleUser.id,
-      totalXp: 150,
-      level: 2,
-      streak: 3,
-      lastActiveDate: new Date(),
-      badges: ["first_lesson", "quick_learner"],
-      achievements: ["completed_first_module"],
-    };
-    this.userStatsMap.set(sampleUser.id, sampleUserStats);
+      console.log("Sample data initialized successfully");
+    } catch (error) {
+      console.error("Error initializing sample data:", error);
+    }
   }
 
   // User operations
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const user: User = {
-      ...insertUser,
-      id: this.currentIds.user++,
-      createdAt: new Date(),
-      role: insertUser.role || "student",
-    };
-    this.users.set(user.id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   // Test operations
   async getTest(id: number): Promise<Test | undefined> {
-    return this.tests.get(id);
+    const [test] = await db.select().from(tests).where(eq(tests.id, id));
+    return test || undefined;
   }
 
   async getTestWithQuestions(id: number): Promise<TestWithQuestions | undefined> {
-    const test = this.tests.get(id);
+    const test = await this.getTest(id);
     if (!test) return undefined;
 
-    const testQuestions = Array.from(this.questions.values())
-      .filter(q => q.testId === id)
-      .sort((a, b) => a.orderIndex - b.orderIndex);
-
-    const creator = test.createdBy ? this.users.get(test.createdBy) : undefined;
-
-    return {
-      ...test,
-      questions: testQuestions,
-      createdByUser: creator,
-    };
+    const testQuestions = await this.getQuestionsByTest(id);
+    return { ...test, questions: testQuestions };
   }
 
   async getPublishedTests(): Promise<Test[]> {
-    return Array.from(this.tests.values()).filter(test => test.isPublished);
-  }
-
-  async getTestsByCreator(creatorId: number): Promise<Test[]> {
-    return Array.from(this.tests.values()).filter(test => test.createdBy === creatorId);
+    return await db.select().from(tests).where(eq(tests.isPublished, true)).orderBy(desc(tests.createdAt));
   }
 
   async createTest(insertTest: InsertTest): Promise<Test> {
-    const test: Test = {
-      ...insertTest,
-      id: this.currentIds.test++,
-      createdAt: new Date(),
-    };
-    this.tests.set(test.id, test);
+    const [test] = await db
+      .insert(tests)
+      .values(insertTest)
+      .returning();
     return test;
   }
 
   async updateTest(id: number, testUpdate: Partial<Test>): Promise<Test | undefined> {
-    const test = this.tests.get(id);
-    if (!test) return undefined;
-
-    const updatedTest = { ...test, ...testUpdate };
-    this.tests.set(id, updatedTest);
-    return updatedTest;
-  }
-
-  async deleteTest(id: number): Promise<boolean> {
-    return this.tests.delete(id);
+    const [updatedTest] = await db
+      .update(tests)
+      .set({ ...testUpdate, updatedAt: new Date() })
+      .where(eq(tests.id, id))
+      .returning();
+    return updatedTest || undefined;
   }
 
   // Question operations
   async getQuestion(id: number): Promise<Question | undefined> {
-    return this.questions.get(id);
+    const [question] = await db.select().from(questions).where(eq(questions.id, id));
+    return question || undefined;
   }
 
   async getQuestionsByTest(testId: number): Promise<Question[]> {
-    return Array.from(this.questions.values())
-      .filter(q => q.testId === testId)
-      .sort((a, b) => a.orderIndex - b.orderIndex);
+    return await db.select().from(questions).where(eq(questions.testId, testId)).orderBy(questions.orderIndex);
   }
 
   async createQuestion(insertQuestion: InsertQuestion): Promise<Question> {
-    const question: Question = {
-      ...insertQuestion,
-      id: this.currentIds.question++,
-    };
-    this.questions.set(question.id, question);
+    const [question] = await db
+      .insert(questions)
+      .values(insertQuestion)
+      .returning();
     return question;
   }
 
   async updateQuestion(id: number, questionUpdate: Partial<Question>): Promise<Question | undefined> {
-    const question = this.questions.get(id);
-    if (!question) return undefined;
-
-    const updatedQuestion = { ...question, ...questionUpdate };
-    this.questions.set(id, updatedQuestion);
-    return updatedQuestion;
-  }
-
-  async deleteQuestion(id: number): Promise<boolean> {
-    return this.questions.delete(id);
+    const [updatedQuestion] = await db
+      .update(questions)
+      .set(questionUpdate)
+      .where(eq(questions.id, id))
+      .returning();
+    return updatedQuestion || undefined;
   }
 
   // Test attempt operations
   async getTestAttempt(id: number): Promise<TestAttempt | undefined> {
-    return this.testAttempts.get(id);
-  }
-
-  async getAttemptWithDetails(id: number): Promise<AttemptWithDetails | undefined> {
-    const attempt = this.testAttempts.get(id);
-    if (!attempt) return undefined;
-
-    const test = this.tests.get(attempt.testId!);
-    if (!test) return undefined;
-
-    const attemptAnswers = Array.from(this.answers.values())
-      .filter(a => a.attemptId === id)
-      .map(answer => ({
-        ...answer,
-        question: this.questions.get(answer.questionId!)!,
-      }))
-      .filter(a => a.question);
-
-    return {
-      ...attempt,
-      test,
-      answers: attemptAnswers,
-    };
+    const [attempt] = await db.select().from(testAttempts).where(eq(testAttempts.id, id));
+    return attempt || undefined;
   }
 
   async getAttemptsByUser(userId: number): Promise<TestAttempt[]> {
-    return Array.from(this.testAttempts.values())
-      .filter(attempt => attempt.userId === userId)
-      .sort((a, b) => new Date(b.startedAt!).getTime() - new Date(a.startedAt!).getTime());
+    return await db.select().from(testAttempts).where(eq(testAttempts.userId, userId)).orderBy(desc(testAttempts.startedAt));
+  }
+
+  async getAttemptWithDetails(id: number): Promise<AttemptWithDetails | undefined> {
+    const attempt = await this.getTestAttempt(id);
+    if (!attempt) return undefined;
+
+    const test = await this.getTest(attempt.testId);
+    if (!test) return undefined;
+
+    const attemptAnswers = await this.getAnswersByAttempt(id);
+    const answersWithQuestions = await Promise.all(
+      attemptAnswers.map(async (answer) => {
+        const question = await this.getQuestion(answer.questionId!);
+        return { ...answer, question: question! };
+      })
+    );
+
+    return { ...attempt, test, answers: answersWithQuestions };
   }
 
   async createTestAttempt(insertAttempt: InsertTestAttempt): Promise<TestAttempt> {
-    const attempt: TestAttempt = {
-      ...insertAttempt,
-      id: this.currentIds.testAttempt++,
-      startedAt: new Date(),
-    };
-    this.testAttempts.set(attempt.id, attempt);
+    const [attempt] = await db
+      .insert(testAttempts)
+      .values(insertAttempt)
+      .returning();
     return attempt;
   }
 
   async updateTestAttempt(id: number, attemptUpdate: Partial<TestAttempt>): Promise<TestAttempt | undefined> {
-    const attempt = this.testAttempts.get(id);
-    if (!attempt) return undefined;
-
-    const updatedAttempt = { ...attempt, ...attemptUpdate };
-    this.testAttempts.set(id, updatedAttempt);
-    return updatedAttempt;
+    const [updatedAttempt] = await db
+      .update(testAttempts)
+      .set(attemptUpdate)
+      .where(eq(testAttempts.id, id))
+      .returning();
+    return updatedAttempt || undefined;
   }
 
   // Answer operations
   async getAnswer(id: number): Promise<Answer | undefined> {
-    return this.answers.get(id);
+    const [answer] = await db.select().from(answers).where(eq(answers.id, id));
+    return answer || undefined;
   }
 
   async getAnswersByAttempt(attemptId: number): Promise<Answer[]> {
-    return Array.from(this.answers.values()).filter(a => a.attemptId === attemptId);
+    return await db.select().from(answers).where(eq(answers.attemptId, attemptId));
   }
 
   async createAnswer(insertAnswer: InsertAnswer): Promise<Answer> {
-    const answer: Answer = {
-      ...insertAnswer,
-      id: this.currentIds.answer++,
-    };
-    this.answers.set(answer.id, answer);
+    const [answer] = await db
+      .insert(answers)
+      .values(insertAnswer)
+      .returning();
     return answer;
   }
 
   async updateAnswer(id: number, answerUpdate: Partial<Answer>): Promise<Answer | undefined> {
-    const answer = this.answers.get(id);
-    if (!answer) return undefined;
-
-    const updatedAnswer = { ...answer, ...answerUpdate };
-    this.answers.set(id, updatedAnswer);
-    return updatedAnswer;
+    const [updatedAnswer] = await db
+      .update(answers)
+      .set(answerUpdate)
+      .where(eq(answers.id, id))
+      .returning();
+    return updatedAnswer || undefined;
   }
 
   // Analytics
@@ -482,8 +379,10 @@ export class MemStorage implements IStorage {
     totalStudyTime: number;
     rank: number;
   }> {
-    const userAttempts = Array.from(this.testAttempts.values())
-      .filter(attempt => attempt.userId === userId && attempt.status === "completed");
+    const userAttempts = await db
+      .select()
+      .from(testAttempts)
+      .where(and(eq(testAttempts.userId, userId), eq(testAttempts.status, "completed")));
 
     const testsTaken = userAttempts.length;
     const totalStudyTime = userAttempts.reduce((total, attempt) => total + (attempt.timeSpent || 0), 0);
@@ -498,7 +397,7 @@ export class MemStorage implements IStorage {
     }
 
     // Calculate rank (simplified - in a real app this would be more sophisticated)
-    const allUsers = Array.from(this.users.values()).filter(u => u.role === "student");
+    const allUsers = await db.select().from(users).where(eq(users.role, "student"));
     const rank = Math.floor(Math.random() * allUsers.length) + 1;
 
     return {
@@ -511,128 +410,129 @@ export class MemStorage implements IStorage {
 
   // Learning module operations
   async getLearningModule(id: number): Promise<LearningModule | undefined> {
-    return this.learningModules.get(id);
+    const [module] = await db.select().from(learningModules).where(eq(learningModules.id, id));
+    return module || undefined;
   }
 
   async getModuleWithLessons(id: number): Promise<ModuleWithLessons | undefined> {
-    const module = this.learningModules.get(id);
+    const module = await this.getLearningModule(id);
     if (!module) return undefined;
 
-    const lessons = Array.from(this.lessons.values())
-      .filter(lesson => lesson.moduleId === id)
-      .sort((a, b) => a.orderIndex - b.orderIndex);
-
-    return { ...module, lessons };
+    const moduleLessons = await this.getLessonsByModule(id);
+    return { ...module, lessons: moduleLessons };
   }
 
   async getPublishedModules(): Promise<LearningModule[]> {
-    return Array.from(this.learningModules.values())
-      .filter(module => module.isPublished)
-      .sort((a, b) => a.id - b.id);
+    return await db.select().from(learningModules).where(eq(learningModules.isPublished, true)).orderBy(learningModules.id);
   }
 
-  async createLearningModule(module: InsertLearningModule): Promise<LearningModule> {
-    const newModule: LearningModule = {
-      ...module,
-      id: this.currentIds.learningModule++,
-      createdAt: new Date(),
-    };
-    this.learningModules.set(newModule.id, newModule);
-    return newModule;
+  async createLearningModule(insertModule: InsertLearningModule): Promise<LearningModule> {
+    const [module] = await db
+      .insert(learningModules)
+      .values(insertModule)
+      .returning();
+    return module;
   }
 
-  async updateLearningModule(id: number, module: Partial<LearningModule>): Promise<LearningModule | undefined> {
-    const existing = this.learningModules.get(id);
-    if (!existing) return undefined;
-
-    const updated = { ...existing, ...module };
-    this.learningModules.set(id, updated);
-    return updated;
+  async updateLearningModule(id: number, moduleUpdate: Partial<LearningModule>): Promise<LearningModule | undefined> {
+    const [updatedModule] = await db
+      .update(learningModules)
+      .set(moduleUpdate)
+      .where(eq(learningModules.id, id))
+      .returning();
+    return updatedModule || undefined;
   }
 
   // Lesson operations
   async getLesson(id: number): Promise<Lesson | undefined> {
-    return this.lessons.get(id);
+    const [lesson] = await db.select().from(lessons).where(eq(lessons.id, id));
+    return lesson || undefined;
   }
 
   async getLessonsByModule(moduleId: number): Promise<Lesson[]> {
-    return Array.from(this.lessons.values())
-      .filter(lesson => lesson.moduleId === moduleId)
-      .sort((a, b) => a.orderIndex - b.orderIndex);
+    return await db.select().from(lessons).where(eq(lessons.moduleId, moduleId)).orderBy(lessons.orderIndex);
   }
 
-  async createLesson(lesson: InsertLesson): Promise<Lesson> {
-    const newLesson: Lesson = {
-      ...lesson,
-      id: this.currentIds.lesson++,
-    };
-    this.lessons.set(newLesson.id, newLesson);
-    return newLesson;
+  async createLesson(insertLesson: InsertLesson): Promise<Lesson> {
+    const [lesson] = await db
+      .insert(lessons)
+      .values(insertLesson)
+      .returning();
+    return lesson;
   }
 
-  async updateLesson(id: number, lesson: Partial<Lesson>): Promise<Lesson | undefined> {
-    const existing = this.lessons.get(id);
-    if (!existing) return undefined;
-
-    const updated = { ...existing, ...lesson };
-    this.lessons.set(id, updated);
-    return updated;
+  async updateLesson(id: number, lessonUpdate: Partial<Lesson>): Promise<Lesson | undefined> {
+    const [updatedLesson] = await db
+      .update(lessons)
+      .set(lessonUpdate)
+      .where(eq(lessons.id, id))
+      .returning();
+    return updatedLesson || undefined;
   }
 
   // User progress operations
   async getUserProgress(userId: number, lessonId: number): Promise<UserProgress | undefined> {
-    return Array.from(this.userProgress.values())
-      .find(progress => progress.userId === userId && progress.lessonId === lessonId);
+    const [progress] = await db
+      .select()
+      .from(userProgress)
+      .where(and(eq(userProgress.userId, userId), eq(userProgress.lessonId, lessonId)));
+    return progress || undefined;
   }
 
   async getUserModuleProgress(userId: number, moduleId: number): Promise<UserProgress[]> {
-    return Array.from(this.userProgress.values())
-      .filter(progress => progress.userId === userId && progress.moduleId === moduleId);
+    return await db
+      .select()
+      .from(userProgress)
+      .where(and(eq(userProgress.userId, userId), eq(userProgress.moduleId, moduleId)));
   }
 
-  async createUserProgress(progress: InsertUserProgress): Promise<UserProgress> {
-    const newProgress: UserProgress = {
-      ...progress,
-      id: this.currentIds.userProgress++,
-    };
-    this.userProgress.set(newProgress.id, newProgress);
-    return newProgress;
+  async createUserProgress(insertProgress: InsertUserProgress): Promise<UserProgress> {
+    const [progress] = await db
+      .insert(userProgress)
+      .values(insertProgress)
+      .returning();
+    return progress;
   }
 
-  async updateUserProgress(id: number, progress: Partial<UserProgress>): Promise<UserProgress | undefined> {
-    const existing = this.userProgress.get(id);
-    if (!existing) return undefined;
-
-    const updated = { ...existing, ...progress };
-    this.userProgress.set(id, updated);
-    return updated;
+  async updateUserProgress(id: number, progressUpdate: Partial<UserProgress>): Promise<UserProgress | undefined> {
+    const [updatedProgress] = await db
+      .update(userProgress)
+      .set(progressUpdate)
+      .where(eq(userProgress.id, id))
+      .returning();
+    return updatedProgress || undefined;
   }
 
   // User stats operations
   async getUserGameStats(userId: number): Promise<UserStats | undefined> {
-    return this.userStatsMap.get(userId);
+    const [stats] = await db.select().from(userStats).where(eq(userStats.userId, userId));
+    return stats || undefined;
   }
 
-  async createOrUpdateUserStats(userId: number, stats: Partial<InsertUserStats>): Promise<UserStats> {
-    const existing = this.userStatsMap.get(userId);
+  async createOrUpdateUserStats(userId: number, statsUpdate: Partial<InsertUserStats>): Promise<UserStats> {
+    const existing = await this.getUserGameStats(userId);
     
     if (existing) {
-      const updated = { ...existing, ...stats };
-      this.userStatsMap.set(userId, updated);
+      const [updated] = await db
+        .update(userStats)
+        .set(statsUpdate)
+        .where(eq(userStats.userId, userId))
+        .returning();
       return updated;
     } else {
-      const newStats: UserStats = {
-        id: this.currentIds.userStats++,
-        userId,
-        totalXp: 0,
-        level: 1,
-        streak: 0,
-        lastActiveDate: new Date(),
-        badges: [],
-        achievements: [],
-        ...stats,
-      };
-      this.userStatsMap.set(userId, newStats);
+      const [newStats] = await db
+        .insert(userStats)
+        .values({
+          userId,
+          totalXp: 0,
+          level: 1,
+          streak: 0,
+          lastActiveDate: new Date(),
+          badges: [],
+          achievements: [],
+          ...statsUpdate,
+        })
+        .returning();
       return newStats;
     }
   }
@@ -676,4 +576,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

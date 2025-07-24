@@ -26,10 +26,12 @@ Preferred communication style: Simple, everyday language.
 - **Development**: Hot module replacement via Vite middleware
 
 ### Database and ORM
-- **Database**: PostgreSQL (configured for Neon serverless)
+- **Database**: PostgreSQL (configured for Neon serverless) - ACTIVE
 - **ORM**: Drizzle ORM with Drizzle Kit for migrations
 - **Schema**: Centralized schema definition in `shared/schema.ts`
 - **Validation**: Zod schemas integrated with Drizzle for type safety
+- **Storage**: Database-backed storage layer replacing in-memory storage
+- **Sample Data**: Automatically initializes with demo user, tests, learning modules, and progress tracking
 
 ## Key Components
 
@@ -132,5 +134,7 @@ Preferred communication style: Simple, everyday language.
 - **Migrations**: Drizzle Kit handles schema migrations
 - **Connection**: Neon serverless PostgreSQL integration
 - **Development**: Push-based schema updates for rapid iteration
+- **Status**: PostgreSQL database active and operational
+- **Storage Architecture**: Fully migrated from in-memory to persistent database storage
 
 The architecture is designed for scalability with clear separation between frontend and backend concerns, while maintaining type safety through shared schemas and strong TypeScript integration throughout the stack.
