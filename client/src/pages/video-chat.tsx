@@ -94,21 +94,61 @@ export default function VideoChat() {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = message;
     setMessage("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/ai-tutor/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: currentMessage,
+          conversationHistory: messages.slice(-5) // Send last 5 messages for context
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const aiResponseData = await response.json();
+      
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         sender: "ai",
-        content: generateAIResponse(message),
+        content: aiResponseData.response,
         timestamp: new Date(),
         type: "text"
       };
       setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: "ai",
+        content: "I'm having trouble connecting to the AI service. Please make sure the OpenAI API key is properly configured in the environment variables. You can also try the fallback response system by asking me about programming topics.",
+        timestamp: new Date(),
+        type: "text"
+      };
+      setMessages(prev => [...prev, errorResponse]);
+      
+      // Fallback to local responses
+      setTimeout(() => {
+        const fallbackResponse: Message = {
+          id: (Date.now() + 2).toString(),
+          sender: "ai",
+          content: generateAIResponse(currentMessage),
+          timestamp: new Date(),
+          type: "text"
+        };
+        setMessages(prev => [...prev, fallbackResponse]);
+      }, 1000);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const generateAIResponse = (userInput: string): string => {

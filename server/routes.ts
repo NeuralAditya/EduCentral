@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { DashboardWebSocket } from "./websocket";
+import { registerAITutorRoutes } from "./routes/ai-tutor";
 import { insertTestSchema, insertQuestionSchema, insertTestAttemptSchema, insertAnswerSchema } from "@shared/schema";
 import { assessVideoResponse, assessPhotoSubmission, assessTextResponse, transcribeAudio } from "./services/openai";
 import { analyzeEmotionFromText, analyzeSpeechQuality, assessContentQuality } from "./services/huggingface";
@@ -453,6 +454,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Quiz routes
   app.use("/api/quiz", (await import("./routes/quiz")).default);
+
+  // AI Tutor routes
+  registerAITutorRoutes(app);
 
   const httpServer = createServer(app);
   

@@ -98,7 +98,7 @@ export default function Learn() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-purple-100 text-sm">Total XP</p>
-                    <p className="text-2xl font-bold">{userStats.totalXp}</p>
+                    <p className="text-2xl font-bold">{userStats.totalXp || 0}</p>
                   </div>
                   <Trophy className="h-8 w-8 text-purple-200" />
                 </div>
@@ -110,7 +110,7 @@ export default function Learn() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-green-100 text-sm">Level</p>
-                    <p className="text-2xl font-bold">{userStats.level}</p>
+                    <p className="text-2xl font-bold">{userStats.level || 1}</p>
                   </div>
                   <Star className="h-8 w-8 text-green-200" />
                 </div>
@@ -122,7 +122,7 @@ export default function Learn() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-orange-100 text-sm">Streak</p>
-                    <p className="text-2xl font-bold">{userStats.streak}</p>
+                    <p className="text-2xl font-bold">{userStats.streak || 0}</p>
                   </div>
                   <Flame className="h-8 w-8 text-orange-200" />
                 </div>
@@ -134,7 +134,7 @@ export default function Learn() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-blue-100 text-sm">Badges</p>
-                    <p className="text-2xl font-bold">{userStats.badges?.length || 0}</p>
+                    <p className="text-2xl font-bold">{Array.isArray(userStats.badges) ? userStats.badges.length : 0}</p>
                   </div>
                   <Award className="h-8 w-8 text-blue-200" />
                 </div>
@@ -169,6 +169,22 @@ export default function Learn() {
           </TabsContent>
 
           <TabsContent value="dsa" className="mt-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredModules.map((module: LearningModule) => (
+                <ModuleCard key={module.id} module={module} />
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="algorithms" className="mt-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredModules.map((module: LearningModule) => (
+                <ModuleCard key={module.id} module={module} />
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="data_structures" className="mt-6">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredModules.map((module: LearningModule) => (
                 <ModuleCard key={module.id} module={module} />
