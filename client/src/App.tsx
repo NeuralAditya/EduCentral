@@ -16,6 +16,10 @@ import QuizTopics from "@/pages/quiz-topics";
 import TopicLevels from "@/pages/topic-levels";
 import QuizTake from "@/pages/quiz-take";
 import QuizResults from "@/pages/quiz-results";
+import VideoChat from "@/pages/video-chat";
+import Terms from "@/pages/terms";
+import Privacy from "@/pages/privacy";
+import About from "@/pages/about";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -34,6 +38,10 @@ function Router() {
       <Route path="/quiz/topic/:topicId" component={TopicLevels} />
       <Route path="/quiz/:quizId" component={QuizTake} />
       <Route path="/quiz/:quizId/results" component={QuizResults} />
+      <Route path="/video-chat" component={VideoChat} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/about" component={About} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -20,7 +20,7 @@ export default function Home() {
             </p>
             
             {/* Main Choice Cards */}
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {/* Learn Mode */}
               <Card className="bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300 shadow-2xl">
                 <CardContent className="p-8 text-center">
@@ -99,8 +99,62 @@ export default function Home() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Video Chat Mode */}
+              <Card className="bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300 shadow-2xl">
+                <CardContent className="p-8 text-center">
+                  <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Users className="h-10 w-10 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4">1:1 AI Tutoring</h3>
+                  <p className="text-blue-100 mb-6">
+                    Interactive video sessions with AI tutors for real-time Q&A and personalized guidance
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+                    <div className="flex items-center">
+                      <Brain className="h-4 w-4 mr-2" />
+                      <span>AI Tutor Chat</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Target className="h-4 w-4 mr-2" />
+                      <span>Video Interaction</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Users className="h-4 w-4 mr-2" />
+                      <span>Real-time Help</span>
+                    </div>
+                    <div className="flex items-center">
+                      <TrendingUp className="h-4 w-4 mr-2" />
+                      <span>Instant Feedback</span>
+                    </div>
+                  </div>
+                  <Link href="/video-chat">
+                    <Button size="lg" className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+                      Start AI Tutoring
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
             </div>
           </div>
+        </div>
+        
+        {/* Footer Links */}
+        <div className="absolute bottom-4 left-0 right-0">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-center space-x-6 text-sm text-blue-200">
+              <Link href="/about" className="hover:text-white transition-colors">About</Link>
+              <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+              <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Copyright Footer */}
+      <div className="bg-gray-900 text-white py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-sm">© 2025 EduCentral. All rights reserved.</p>
         </div>
       </div>
 

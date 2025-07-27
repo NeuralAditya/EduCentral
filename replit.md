@@ -2,7 +2,7 @@
 
 ## Overview
 
-EduCentral is a comprehensive educational platform featuring advanced AI-powered assessment and gamified learning. The platform offers: (1) Learn & Practice - a gamified learning system for DSA, algorithms, and programming concepts with XP, badges, and progress tracking, and (2) Enhanced AI Assessment - revolutionary testing with real-time webcam/microphone access, facial expression analysis using MediaPipe, speech-to-text conversion with HuggingFace APIs, emotion/confidence evaluation, and comprehensive performance reports combining content analysis with visual/audio feedback.
+EduCentral is a comprehensive educational platform featuring advanced AI-powered assessment and gamified learning. The platform offers: (1) Learn & Practice - a gamified learning system for DSA, algorithms, and programming concepts with XP, badges, and progress tracking, (2) Enhanced AI Assessment - revolutionary testing with real-time webcam/microphone access, facial expression analysis using MediaPipe, speech-to-text conversion with HuggingFace APIs, emotion/confidence evaluation, and comprehensive performance reports combining content analysis with visual/audio feedback, (3) Topic-based Quiz System - structured quizzes for DSA, Java, and Python with multiple difficulty levels, scoring, and leaderboards, and (4) 1:1 AI Video Tutoring - interactive video chat sessions with AI tutors for real-time Q&A and personalized learning support.
 
 ## User Preferences
 
@@ -55,6 +55,25 @@ Preferred communication style: Simple, everyday language.
 - **Test Configuration**: Duration limits, difficulty levels, subject categorization
 - **Publishing**: Draft/published states for test management
 
+### Topic-based Quiz System
+- **Quiz Topics**: DSA, Java, and Python programming categories
+- **Difficulty Levels**: Beginner, Intermediate, and Advanced progression
+- **Question Format**: Multiple-choice questions with explanations
+- **Scoring System**: Points-based scoring with passing thresholds
+- **Progress Tracking**: User quiz attempts and performance analytics
+- **Badge System**: Bronze, Silver, Gold badges based on achievements
+- **Leaderboards**: Performance rankings and competitive elements
+- **Retry Functionality**: Multiple attempts allowed for improvement
+
+### 1:1 AI Video Tutoring
+- **Video Chat Interface**: Real-time video interaction with AI tutor
+- **AI Conversation**: Intelligent responses to programming questions
+- **Quick Topics**: Pre-defined topic buttons for common subjects
+- **Video Controls**: Camera and microphone toggle functionality
+- **Real-time Chat**: Text-based communication alongside video
+- **Subject Expertise**: Covers DSA, algorithms, Java, Python, and system design
+- **Personalized Learning**: Adaptive responses based on user questions
+
 ### Enhanced AI Assessment Engine
 - **OpenAI Integration**: GPT-4o model for intelligent content assessment
 - **HuggingFace Integration**: Free emotion analysis, sentiment analysis, and speech quality assessment
@@ -100,6 +119,8 @@ Preferred communication style: Simple, everyday language.
 - **User Progress**: Lesson completion tracking and time spent analytics
 - **User Stats**: XP totals, levels, streaks, badges, and achievements
 - **Analytics**: Performance metrics and learning statistics
+- **Quiz Data**: Topics, quizzes, quiz questions, user quiz attempts, and quiz badges
+- **Legal Pages**: Terms and conditions, privacy policy, and about page content
 
 ## External Dependencies
 
@@ -138,5 +159,7 @@ Preferred communication style: Simple, everyday language.
 - **Development**: Push-based schema updates for rapid iteration
 - **Status**: PostgreSQL database active and operational
 - **Storage Architecture**: Fully migrated from in-memory to persistent database storage
+- **Copyright Integration**: EduCentral branding and copyright notices throughout application
+- **Legal Compliance**: Comprehensive terms of service, privacy policy, and about pages
 
 The architecture is designed for scalability with clear separation between frontend and backend concerns, while maintaining type safety through shared schemas and strong TypeScript integration throughout the stack.
