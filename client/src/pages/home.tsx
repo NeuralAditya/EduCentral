@@ -1,160 +1,202 @@
 import { Link } from "wouter";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, BookOpen, Brain, Trophy, Zap, Target, Users, TrendingUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { 
+  GraduationCap, 
+  BookOpen, 
+  Brain, 
+  Trophy, 
+  Zap, 
+  Target, 
+  Users, 
+  TrendingUp,
+  Play,
+  CheckCircle,
+  Star,
+  ArrowRight,
+  User,
+  LogIn
+} from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary to-blue-600 text-white">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-8">
-              <GraduationCap className="h-16 w-16 mr-4" />
-              <h1 className="text-5xl md:text-6xl font-bold">EduCentral</h1>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Navigation Header */}
+      <nav className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <GraduationCap className="h-8 w-8 text-primary mr-3" />
+              <span className="text-2xl font-bold text-gray-900">EduCentral</span>
             </div>
-            <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto">
-              Master programming concepts through gamified learning and AI-powered assessments
+            <div className="flex items-center space-x-4">
+              <Link href="/login">
+                <Button variant="outline" size="sm">
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Login
+                </Button>
+              </Link>
+              <Link href="/admin">
+                <Button variant="ghost" size="sm">
+                  <User className="h-4 w-4 mr-2" />
+                  Admin
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-blue-500/10 to-purple-600/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center">
+            <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
+              🚀 Next-Generation Learning Platform
+            </Badge>
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+              Master Programming
+              <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent block">
+                Through AI & Gamification
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
+              Experience the future of education with personalized AI tutoring, interactive assessments, 
+              and gamified learning that adapts to your pace and style.
             </p>
             
-            {/* Main Choice Cards */}
-            <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {/* Learn Mode */}
-              <Card className="bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300 shadow-2xl">
-                <CardContent className="p-8 text-center">
-                  <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                    <BookOpen className="h-10 w-10 text-white" />
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              <Link href="/dashboard">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Play className="h-5 w-5 mr-2" />
+                  Try Mock Tests
+                </Button>
+              </Link>
+              <Link href="/learn">
+                <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                  <BookOpen className="h-5 w-5 mr-2" />
+                  Start Learning
+                </Button>
+              </Link>
+            </div>
+
+            {/* Feature Cards Grid */}
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {/* Gamified Learning */}
+              <Card className="group hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:-translate-y-2">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <BookOpen className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-4">Learn & Practice</h3>
-                  <p className="text-blue-100 mb-6">
-                    Gamified learning modules for DSA, algorithms, and programming concepts with XP, badges, and streaks
+                  <CardTitle className="text-xl font-bold text-gray-900">Gamified Learning</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center pt-0">
+                  <p className="text-gray-600 mb-6 leading-relaxed">
+                    Interactive lessons with XP points, badges, and streaks. Master DSA, algorithms, and programming concepts.
                   </p>
-                  <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
-                    <div className="flex items-center">
-                      <Brain className="h-4 w-4 mr-2" />
-                      <span>Interactive Lessons</span>
+                  <div className="space-y-2 mb-6">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                      <span>XP & Level System</span>
                     </div>
-                    <div className="flex items-center">
-                      <Zap className="h-4 w-4 mr-2" />
-                      <span>XP & Badges</span>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                      <span>Achievement Badges</span>
                     </div>
-                    <div className="flex items-center">
-                      <Target className="h-4 w-4 mr-2" />
-                      <span>Progress Tracking</span>
-                    </div>
-                    <div className="flex items-center">
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      <span>Skill Building</span>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                      <span>Learning Streaks</span>
                     </div>
                   </div>
                   <Link href="/learn">
-                    <Button size="lg" className="w-full bg-secondary hover:bg-green-700 text-white">
-                      Start Learning Journey
+                    <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg font-semibold">
+                      Start Learning
+                      <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
                   </Link>
                 </CardContent>
               </Card>
 
-              {/* Test Mode */}
-              <Card className="bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300 shadow-2xl">
-                <CardContent className="p-8 text-center">
-                  <div className="w-20 h-20 bg-accent rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Trophy className="h-10 w-10 text-white" />
+              {/* AI Assessment */}
+              <Card className="group hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:-translate-y-2">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Brain className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-4">Test & Assess</h3>
-                  <p className="text-blue-100 mb-6">
-                    AI-powered mock tests with video, photo, and text assessments for comprehensive evaluation
+                  <CardTitle className="text-xl font-bold text-gray-900">AI-Powered Assessment</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center pt-0">
+                  <p className="text-gray-600 mb-6 leading-relaxed">
+                    Advanced AI evaluates your video responses, coding solutions, and provides detailed feedback.
                   </p>
-                  <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
-                    <div className="flex items-center">
-                      <Brain className="h-4 w-4 mr-2" />
-                      <span>AI Assessment</span>
+                  <div className="space-y-2 mb-6">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-blue-500 mr-2" />
+                      <span>Video Analysis</span>
                     </div>
-                    <div className="flex items-center">
-                      <Users className="h-4 w-4 mr-2" />
-                      <span>Mock Tests</span>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-blue-500 mr-2" />
+                      <span>Facial Recognition</span>
                     </div>
-                    <div className="flex items-center">
-                      <Target className="h-4 w-4 mr-2" />
-                      <span>Performance Analytics</span>
-                    </div>
-                    <div className="flex items-center">
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      <span>Detailed Feedback</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <Link href="/dashboard" className="flex-1">
-                      <Button size="lg" className="w-full bg-accent hover:bg-orange-700 text-white">
-                        AI Assessment
-                      </Button>
-                    </Link>
-                    <Link href="/quiz/topics" className="flex-1">
-                      <Button size="lg" variant="outline" className="w-full border-orange-300 text-orange-700 hover:bg-orange-50">
-                        Quiz Challenge
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Video Chat Mode */}
-              <Card className="bg-white/10 border-white/20 hover:bg-white/20 transition-all duration-300 shadow-2xl">
-                <CardContent className="p-8 text-center">
-                  <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Users className="h-10 w-10 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4">1:1 AI Tutoring</h3>
-                  <p className="text-blue-100 mb-6">
-                    Interactive video sessions with AI tutors for real-time Q&A and personalized guidance
-                  </p>
-                  <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
-                    <div className="flex items-center">
-                      <Brain className="h-4 w-4 mr-2" />
-                      <span>AI Tutor Chat</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Target className="h-4 w-4 mr-2" />
-                      <span>Video Interaction</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Users className="h-4 w-4 mr-2" />
-                      <span>Real-time Help</span>
-                    </div>
-                    <div className="flex items-center">
-                      <TrendingUp className="h-4 w-4 mr-2" />
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-blue-500 mr-2" />
                       <span>Instant Feedback</span>
                     </div>
                   </div>
+                  <div className="flex gap-2">
+                    <Link href="/dashboard" className="flex-1">
+                      <Button className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-lg font-semibold">
+                        Mock Tests
+                      </Button>
+                    </Link>
+                    <Link href="/quiz/topics" className="flex-1">
+                      <Button variant="outline" className="w-full border-blue-200 text-blue-600 hover:bg-blue-50 rounded-lg">
+                        Quizzes
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* 1:1 AI Tutoring */}
+              <Card className="group hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:-translate-y-2">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Users className="h-8 w-8 text-white" />
+                  </div>
+                  <CardTitle className="text-xl font-bold text-gray-900">1:1 AI Tutoring</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center pt-0">
+                  <p className="text-gray-600 mb-6 leading-relaxed">
+                    Interactive video sessions with AI tutors for personalized guidance and real-time Q&A support.
+                  </p>
+                  <div className="space-y-2 mb-6">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-purple-500 mr-2" />
+                      <span>Live Video Chat</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-purple-500 mr-2" />
+                      <span>AI Tutor Response</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-purple-500 mr-2" />
+                      <span>24/7 Availability</span>
+                    </div>
+                  </div>
                   <Link href="/video-chat">
-                    <Button size="lg" className="w-full bg-purple-600 hover:bg-purple-700 text-white">
-                      Start AI Tutoring
+                    <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-lg font-semibold">
+                      Start Tutoring
+                      <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
                   </Link>
                 </CardContent>
               </Card>
             </div>
           </div>
-        </div>
-        
-        {/* Footer Links */}
-        <div className="absolute bottom-4 left-0 right-0">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-center space-x-6 text-sm text-blue-200">
-              <Link href="/about" className="hover:text-white transition-colors">About</Link>
-              <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-              <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Copyright Footer */}
-      <div className="bg-gray-900 text-white py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm">© 2025 EduCentral. All rights reserved.</p>
         </div>
       </div>
 
@@ -222,6 +264,20 @@ export default function Home() {
                 Try Mock Tests
               </Button>
             </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="bg-gray-900 text-white py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center space-x-8 mb-4">
+            <Link href="/about" className="text-gray-300 hover:text-white transition-colors">About</Link>
+            <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">Terms</Link>
+            <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">Privacy</Link>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-gray-400">© 2025 EduCentral. All rights reserved.</p>
           </div>
         </div>
       </div>

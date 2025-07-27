@@ -20,6 +20,8 @@ import VideoChat from "@/pages/video-chat";
 import Terms from "@/pages/terms";
 import Privacy from "@/pages/privacy";
 import About from "@/pages/about";
+import Login from "@/pages/login";
+import Admin from "@/pages/admin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -42,6 +44,8 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/about" component={About} />
+      <Route path="/login" component={Login} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );
