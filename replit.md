@@ -36,8 +36,10 @@ Preferred communication style: Simple, everyday language.
 ## Key Components
 
 ### Home Page & Navigation
-- **Mode Selection**: Users choose between "Learn & Practice" and "Test & Assess" modes
-- **Feature Overview**: Highlighting gamified learning and AI assessment capabilities
+- **Modern Design**: Animated homepage with AI robot character, floating books, and tech elements
+- **Interactive Elements**: Smooth animations, hover effects, and engaging visual feedback
+- **Authentication System**: Role-based login with admin and student accounts
+- **Demo Credentials**: Admin (admin@educentral.com/admin123), Student (student@demo.com/student123)
 - **Responsive Design**: Modern gradient-based UI with clear navigation paths
 
 ### Gamified Learning System

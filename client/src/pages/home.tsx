@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { useAuth } from "@/components/auth-guard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,8 @@ import {
 } from "lucide-react";
 
 export default function Home() {
+  const { user, logout } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Navigation Header */}
@@ -36,18 +39,38 @@ export default function Home() {
               <span className="text-2xl font-bold text-gray-900">EduCentral</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/login">
-                <Button variant="outline" size="sm">
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Login
-                </Button>
-              </Link>
-              <Link href="/admin">
-                <Button variant="ghost" size="sm">
-                  <User className="h-4 w-4 mr-2" />
-                  Admin
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  <span className="text-sm text-gray-600">Welcome, {user.name}</span>
+                  {user.role === "admin" && (
+                    <Link href="/admin">
+                      <Button variant="ghost" size="sm">
+                        <User className="h-4 w-4 mr-2" />
+                        Admin Panel
+                      </Button>
+                    </Link>
+                  )}
+                  <Button variant="outline" size="sm" onClick={logout}>
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="outline" size="sm">
+                      <LogIn className="h-4 w-4 mr-2" />
+                      Login
+                    </Button>
+                  </Link>
+                  <Link href="/admin">
+                    <Button variant="ghost" size="sm">
+                      <User className="h-4 w-4 mr-2" />
+                      Admin
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

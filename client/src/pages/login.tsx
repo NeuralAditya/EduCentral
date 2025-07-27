@@ -26,18 +26,53 @@ export default function Login() {
       // Simulate login process
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // For demo purposes, any email/password combination works
       if (formData.email && formData.password) {
-        // Store user session
-        localStorage.setItem("educentral_user", JSON.stringify({
-          id: 1,
-          email: formData.email,
-          name: formData.email.split("@")[0],
-          loginTime: new Date().toISOString()
-        }));
+        let user;
+        let redirectPath = "/dashboard";
+
+        // Check for admin credentials
+        if (formData.email === "admin@educentral.com" && formData.password === "admin123") {
+          user = {
+            id: 1,
+            email: formData.email,
+            name: "Admin User",
+            role: "admin",
+            loginTime: new Date().toISOString()
+          };
+          redirectPath = "/admin";
+        }
+        // Check for demo student credentials
+        else if (formData.email === "student@demo.com" && formData.password === "student123") {
+          user = {
+            id: 2,
+            email: formData.email,
+            name: "Demo Student",
+            role: "student",
+            loginTime: new Date().toISOString()
+          };
+          redirectPath = "/dashboard";
+        }
+        // Allow any other email/password for demo purposes
+        else if (formData.email && formData.password) {
+          user = {
+            id: 3,
+            email: formData.email,
+            name: formData.email.split("@")[0],
+            role: "student",
+            loginTime: new Date().toISOString()
+          };
+          redirectPath = "/dashboard";
+        }
+        else {
+          setError("Please enter both email and password");
+          return;
+        }
         
-        // Redirect to dashboard
-        setLocation("/dashboard");
+        // Store user session
+        localStorage.setItem("educentral_user", JSON.stringify(user));
+        
+        // Redirect based on role
+        setLocation(redirectPath);
       } else {
         setError("Please enter both email and password");
       }
@@ -172,9 +207,22 @@ export default function Login() {
                 </div>
 
                 <div className="text-center pt-4 border-t border-gray-200">
-                  <p className="text-xs text-gray-500">
-                    Demo: Use any email and password to login
-                  </p>
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-gray-700 mb-3">Demo Accounts:</p>
+                    <div className="bg-blue-50 p-3 rounded-lg text-left">
+                      <p className="text-xs font-medium text-blue-800 mb-1">Admin Account</p>
+                      <p className="text-xs text-blue-600">Email: admin@educentral.com</p>
+                      <p className="text-xs text-blue-600">Password: admin123</p>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg text-left">
+                      <p className="text-xs font-medium text-green-800 mb-1">Student Account</p>
+                      <p className="text-xs text-green-600">Email: student@demo.com</p>
+                      <p className="text-xs text-green-600">Password: student123</p>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Or use any email/password combination
+                    </p>
+                  </div>
                 </div>
               </form>
             </CardContent>

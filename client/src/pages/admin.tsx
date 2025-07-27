@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
+import AuthGuard, { useAuth } from "@/components/auth-guard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,8 +44,9 @@ const mockTests = [
   { id: 3, title: "Python Basics", type: "Video Response", students: 28, avgScore: 85, status: "draft" },
 ];
 
-export default function Admin() {
+function AdminContent() {
   const [searchTerm, setSearchTerm] = useState("");
+  const { user, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -62,15 +64,16 @@ export default function Admin() {
               </Badge>
             </div>
             <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">Welcome, {user?.name}</span>
               <Link href="/">
                 <Button variant="outline" size="sm">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Home
                 </Button>
               </Link>
-              <Button size="sm">
+              <Button size="sm" onClick={logout}>
                 <Settings className="h-4 w-4 mr-2" />
-                Settings
+                Logout
               </Button>
             </div>
           </div>
@@ -423,5 +426,13 @@ export default function Admin() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Admin() {
+  return (
+    <AuthGuard requireAdmin={true}>
+      <AdminContent />
+    </AuthGuard>
   );
 }
