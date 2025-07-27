@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { DashboardWebSocket } from "./websocket";
 import { insertTestSchema, insertQuestionSchema, insertTestAttemptSchema, insertAnswerSchema } from "@shared/schema";
 import { assessVideoResponse, assessPhotoSubmission, assessTextResponse, transcribeAudio } from "./services/openai";
 import { analyzeEmotionFromText, analyzeSpeechQuality, assessContentQuality } from "./services/huggingface";
@@ -454,5 +455,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/quiz", (await import("./routes/quiz")).default);
 
   const httpServer = createServer(app);
+  
+  // Initialize WebSocket server
+  const dashboardWS = new DashboardWebSocket(httpServer);
+  
+  // Add dashboard API endpoints
+  app.get("/api/dashboard-stats", async (req, res) => {
+    const liveUsers = dashboardWS.getConnectedUsers();
+    const stats = {
+      liveUsers: liveUsers.length,
+      totalStudents: liveUsers.filter(u => u.role === 'student').length,
+      totalAdmins: liveUsers.filter(u => u.role === 'admin').length,
+      testsCompletedToday: Math.floor(Math.random() * 50) + 15,
+      averageScore: Math.floor(Math.random() * 30) + 70,
+      activeTests: Math.floor(Math.random() * 10) + 5
+    };
+    res.json(stats);
+  });
+
+  app.get("/api/student-dashboard/:id", async (req, res) => {
+    const studentId = req.params.id;
+    
+    // Mock student dashboard data - in real app, fetch from database
+    const dashboardData = {
+      stats: {
+        testsTaken: Math.floor(Math.random() * 20) + 5,
+        averageScore: Math.floor(Math.random() * 30) + 70,
+        totalTimeSpent: Math.floor(Math.random() * 100) + 50,
+        rank: Math.floor(Math.random() * 100) + 1
+      },
+      recentTests: [
+        { id: 1, title: "Data Structures Basics", score: 85, date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), status: "completed" },
+        { id: 2, title: "Python Programming", score: 92, date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), status: "completed" },
+        { id: 3, title: "Algorithm Analysis", score: 78, date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), status: "completed" },
+      ],
+      upcomingTests: [
+        { id: 4, title: "Advanced Algorithms", scheduledDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), difficulty: "Hard" },
+        { id: 5, title: "System Design", scheduledDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), difficulty: "Medium" },
+      ],
+      achievements: [
+        { id: 1, title: "First Test Completed", icon: "🎯", earnedDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000) },
+        { id: 2, title: "High Scorer", icon: "🏆", earnedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) },
+        { id: 3, title: "Consistent Learner", icon: "📚", earnedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
+      ]
+    };
+    
+    res.json(dashboardData);
+  });
+
   return httpServer;
 }

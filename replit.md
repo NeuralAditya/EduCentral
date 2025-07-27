@@ -163,5 +163,8 @@ Preferred communication style: Simple, everyday language.
 - **Storage Architecture**: Fully migrated from in-memory to persistent database storage
 - **Copyright Integration**: EduCentral branding and copyright notices throughout application
 - **Legal Compliance**: Comprehensive terms of service, privacy policy, and about pages
+- **Real-time Dashboard System**: WebSocket-based live connections between admin and student dashboards
+- **Live User Tracking**: Admin dashboard shows real-time connected users and activity
+- **SnackStack™ Integration**: About page includes information about parent company and meal ordering system
 
 The architecture is designed for scalability with clear separation between frontend and backend concerns, while maintaining type safety through shared schemas and strong TypeScript integration throughout the stack.

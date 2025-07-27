@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import AuthGuard, { useAuth } from "@/components/auth-guard";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,7 +47,47 @@ const mockTests = [
 
 function AdminContent() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [websocket, setWebsocket] = useState<WebSocket | null>(null);
+  const [liveData, setLiveData] = useState<any>(null);
   const { user, logout } = useAuth();
+
+  const { data: dashboardStats } = useQuery({
+    queryKey: ["/api/dashboard-stats"],
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  useEffect(() => {
+    if (!user || user.role !== 'admin') return;
+
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    const ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+      console.log('Admin WebSocket connected');
+      ws.send(JSON.stringify({
+        type: 'auth',
+        user: user
+      }));
+      setWebsocket(ws);
+    };
+
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === 'dashboard_update') {
+        setLiveData(message.data);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log('Admin WebSocket disconnected');
+      setWebsocket(null);
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -93,15 +134,18 @@ function AdminContent() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900">{mockStats.totalUsers.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-gray-600">Live Users</p>
+                  <p className="text-2xl font-bold text-gray-900">{liveData?.totalUsers || dashboardStats?.liveUsers || 0}</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                   <Users className="h-6 w-6 text-blue-600" />
                 </div>
               </div>
               <div className="mt-4">
-                <span className="text-sm text-green-600">↗ +12% from last month</span>
+                <span className="text-sm text-green-600">
+                  {websocket && <span className="animate-pulse">● </span>}
+                  Currently online
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -110,8 +154,8 @@ function AdminContent() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Active Tests</p>
-                  <p className="text-2xl font-bold text-gray-900">{mockStats.activeTests}</p>
+                  <p className="text-sm font-medium text-gray-600">Tests Today</p>
+                  <p className="text-2xl font-bold text-gray-900">{dashboardStats?.testsCompletedToday || 24}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                   <BookOpen className="h-6 w-6 text-green-600" />

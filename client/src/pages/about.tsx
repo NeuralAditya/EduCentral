@@ -50,6 +50,44 @@ export default function About() {
           </CardContent>
         </Card>
 
+        {/* Company Background */}
+        <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center text-blue-900">From the Creators of SnackStack™</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center mb-6">
+              <p className="text-lg text-gray-700 leading-relaxed mb-4">
+                EduCentral is proudly developed by the same innovative team behind <strong>SnackStack™</strong>, 
+                a revolutionary campus meal ordering system that transformed how students access food services.
+              </p>
+              <p className="text-gray-600 mb-6">
+                Building on our success in streamlining campus life through technology, we've now turned our 
+                attention to revolutionizing education with AI-powered learning platforms.
+              </p>
+              <a 
+                href="https://snackstack.onrender.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200"
+              >
+                <span className="mr-2">🍕</span>
+                Visit SnackStack™
+                <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
+              </a>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h4 className="font-semibold text-gray-900 mb-3">What is SnackStack™?</h4>
+              <p className="text-gray-600">
+                SnackStack™ was our flagship campus meal ordering system that allowed students to seamlessly 
+                order food from campus restaurants, track deliveries in real-time, and manage their meal plans 
+                digitally. The platform served thousands of students and demonstrated our commitment to 
+                improving student life through innovative technology solutions.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <Card>
