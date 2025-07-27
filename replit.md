@@ -166,8 +166,10 @@ Preferred communication style: Simple, everyday language.
 - **Real-time Dashboard System**: WebSocket-based live connections between admin and student dashboards
 - **Live User Tracking**: Admin dashboard shows real-time connected users and activity
 - **SnackStack™ Integration**: About page includes information about parent company and meal ordering system
-- **OpenAI API Integration**: AI tutoring system uses GPT-4o model for intelligent responses with fallback to local responses
+- **Puter.js AI Integration**: Free AI tutoring system using Puter.js for GPT-4o access without API key requirements
+- **OpenAI API Integration**: Legacy support with fallback system for when external APIs are unavailable
 - **Gamified Learning System**: Fixed startup issues and implemented proper lesson progression with XP rewards
 - **Error Handling**: Comprehensive error handling for API quota limits and connection issues
+- **Puter.js Integration**: Free AI capabilities using Puter.js CDN for GPT-4o access without API keys
 
 The architecture is designed for scalability with clear separation between frontend and backend concerns, while maintaining type safety through shared schemas and strong TypeScript integration throughout the stack.

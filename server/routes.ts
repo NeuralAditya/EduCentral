@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { DashboardWebSocket } from "./websocket";
 import { registerAITutorRoutes } from "./routes/ai-tutor";
+import { registerPuterAIRoutes } from "./routes/puter-ai";
 import { insertTestSchema, insertQuestionSchema, insertTestAttemptSchema, insertAnswerSchema } from "@shared/schema";
 import { assessVideoResponse, assessPhotoSubmission, assessTextResponse, transcribeAudio } from "./services/openai";
 import { analyzeEmotionFromText, analyzeSpeechQuality, assessContentQuality } from "./services/huggingface";
@@ -457,6 +458,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // AI Tutor routes
   registerAITutorRoutes(app);
+
+  // Puter.js AI routes
+  registerPuterAIRoutes(app);
 
   const httpServer = createServer(app);
   

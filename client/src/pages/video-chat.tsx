@@ -1,4 +1,22 @@
 import { useState, useRef, useEffect } from "react";
+
+// Declare Puter.js types for TypeScript
+declare global {
+  interface Window {
+    puter?: {
+      ai?: {
+        chat: (message: string, options?: { model?: string }) => Promise<string>;
+        txt2img: (prompt: string, test?: boolean) => Promise<HTMLImageElement>;
+        txt2speech: (text: string, options?: any) => Promise<HTMLAudioElement>;
+      };
+      auth?: {
+        isSignedIn: () => boolean;
+        signIn: () => Promise<any>;
+        getUser: () => Promise<any>;
+      };
+    };
+  }
+}
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -42,6 +60,7 @@ export default function VideoChat() {
   ]);
   const [isConnected, setIsConnected] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
+  const [puterStatus, setPuterStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -53,6 +72,20 @@ export default function VideoChat() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Check Puter.js availability
+  useEffect(() => {
+    const checkPuter = () => {
+      if (typeof window !== 'undefined' && window.puter && window.puter.ai) {
+        setPuterStatus('ready');
+      } else {
+        // Retry after a short delay
+        setTimeout(checkPuter, 1000);
+      }
+    };
+    
+    checkPuter();
+  }, []);
 
   const startVideo = async () => {
     try {
@@ -99,53 +132,57 @@ export default function VideoChat() {
     setIsTyping(true);
 
     try {
-      const response = await fetch('/api/ai-tutor/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: currentMessage,
-          conversationHistory: messages.slice(-5) // Send last 5 messages for context
-        }),
-      });
+      // Use Puter.js for free AI capabilities
+      // @ts-ignore - Puter.js is loaded via CDN
+      if (typeof window !== 'undefined' && window.puter && window.puter.ai) {
+        // Build conversation context for better responses
+        const conversationContext = messages.slice(-3).map(msg => 
+          `${msg.sender === 'user' ? 'User' : 'Assistant'}: ${msg.content}`
+        ).join('\n');
+        
+        const contextualMessage = conversationContext 
+          ? `Previous conversation:\n${conversationContext}\n\nCurrent question: ${currentMessage}`
+          : currentMessage;
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+        const systemPrompt = `You are an expert AI programming tutor for EduCentral. You specialize in:
+- Data Structures and Algorithms (DSA)
+- Programming languages (Python, Java, JavaScript)
+- Software engineering concepts
+- System design principles
+- Code optimization and best practices
 
-      const aiResponseData = await response.json();
-      
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: "ai",
-        content: aiResponseData.response,
-        timestamp: new Date(),
-        type: "text"
-      };
-      setMessages(prev => [...prev, aiResponse]);
-    } catch (error) {
-      console.error('Error getting AI response:', error);
-      const errorResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: "ai",
-        content: "I'm having trouble connecting to the AI service. Please make sure the OpenAI API key is properly configured in the environment variables. You can also try the fallback response system by asking me about programming topics.",
-        timestamp: new Date(),
-        type: "text"
-      };
-      setMessages(prev => [...prev, errorResponse]);
-      
-      // Fallback to local responses
-      setTimeout(() => {
-        const fallbackResponse: Message = {
-          id: (Date.now() + 2).toString(),
+Keep responses helpful, educational, and encouraging. Provide clear explanations with examples when appropriate.
+
+User question: ${contextualMessage}`;
+
+        // @ts-ignore
+        const response = await window.puter.ai.chat(systemPrompt, {
+          model: 'gpt-4o' // Use GPT-4o for best responses
+        });
+
+        const aiResponse: Message = {
+          id: (Date.now() + 1).toString(),
           sender: "ai",
-          content: generateAIResponse(currentMessage),
+          content: response,
           timestamp: new Date(),
           type: "text"
         };
-        setMessages(prev => [...prev, fallbackResponse]);
-      }, 1000);
+        setMessages(prev => [...prev, aiResponse]);
+      } else {
+        throw new Error('Puter.js not available');
+      }
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      
+      // Fallback to local responses if Puter.js fails
+      const fallbackResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: "ai",
+        content: generateAIResponse(currentMessage),
+        timestamp: new Date(),
+        type: "text"
+      };
+      setMessages(prev => [...prev, fallbackResponse]);
     } finally {
       setIsTyping(false);
     }
@@ -193,6 +230,10 @@ export default function VideoChat() {
               </Link>
             </div>
             <div className="flex items-center space-x-4">
+              <Badge variant={puterStatus === 'ready' ? "default" : puterStatus === 'loading' ? "secondary" : "destructive"}>
+                {puterStatus === 'ready' ? "🤖 AI Ready (Puter.js)" : 
+                 puterStatus === 'loading' ? "⏳ Loading AI..." : "❌ AI Unavailable"}
+              </Badge>
               <Badge variant={isConnected ? "default" : "destructive"}>
                 {isConnected ? "Connected" : "Disconnected"}
               </Badge>
