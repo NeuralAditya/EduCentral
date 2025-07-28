@@ -7,9 +7,9 @@
 [![AGPLv3 License](https://img.shields.io/badge/License-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 [![Commercial License](https://img.shields.io/badge/License-Commercial-lightgrey.svg)](LICENSE-COMMERCIAL.txt)
 [![EduCentral](https://img.shields.io/badge/-Educentral-2ECC71?style=flat-square)](https://github.com/NeuralAditya/EduCentral)
-[![Contributors](https://img.shields.io/github/contributors/NeuralAditya/duCentral)](https://github.com/NeuralAditya/duCentral/graphs/contributors)
-[![Issues](https://img.shields.io/github/issues/NeuralAditya/duCentral)](https://github.com/NeuralAditya/duCentral/issues)
-[![Last Commit](https://img.shields.io/github/last-commit/NeuralAditya/duCentral)](https://github.com/NeuralAditya/EduCentral/commits/main)
+[![Contributors](https://img.shields.io/github/contributors/NeuralAditya/EduCentral)](https://github.com/NeuralAditya/EduCentral/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/NeuralAditya/EduCentral)](https://github.com/NeuralAditya/EduCentral/issues)
+[![Last Commit](https://img.shields.io/github/last-commit/NeuralAditya/EduCentral)](https://github.com/NeuralAditya/EduCentral/commits/main)
 
 <p align="left"> 
   <img src="https://img.shields.io/badge/Frontend-React-blue?logo=react" alt="React"/> 
