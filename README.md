@@ -12,15 +12,14 @@
 [![Last Commit](https://img.shields.io/github/last-commit/NeuralAditya/EduCentral)](https://github.com/NeuralAditya/EduCentral/commits/main)
 
 <p align="left"> 
-  <img src="https://img.shields.io/badge/Frontend-React-blue?logo=react" alt="React"/> 
-  <img src="https://img.shields.io/badge/Build-Vite-646CFF?logo=vite" alt="Vite"/> 
-  <img src="https://img.shields.io/badge/Style-Tailwind_CSS-38B2AC?logo=tailwind-css" alt="Tailwind CSS"/> 
-  <img src="https://img.shields.io/badge/Backend-Node.js-339933?logo=node.js" alt="Node.js"/> 
+  <img src="https://img.shields.io/badge/React-%2320232a.svg?logo=react&logoColor=%2361DAFB" alt="React"/> 
+  <img src="https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=fff" alt="Vite"/> 
+  <img src="https://img.shields.io/badge/Tailwind%20CSS-%2338B2AC.svg?logo=tailwind-css&logoColor=white" alt="Tailwind CSS"/> 
+  <img src="https://img.shields.io/badge/Node.js-6DA55F?logo=node.js&logoColor=white" alt="Node.js"/> 
   <img src="https://img.shields.io/badge/Framework-Express.js-000000?logo=express" alt="Express.js"/> 
   <img src="https://img.shields.io/badge/Database-PostgreSQL-4169E1?logo=postgresql" alt="PostgreSQL"/> 
-  <img src="https://img.shields.io/badge/ORM-Drizzle%20ORM-6C3483" alt="Drizzle ORM"/> 
-  <img src="https://img.shields.io/badge/Auth-Passport.js-34E27A?logo=passport" alt="Passport.js"/> 
-  <img src="https://img.shields.io/badge/Payments-Points%20System-orange" alt="Points Based System"/> 
+  <img src="https://img.shields.io/badge/ORM-Drizzle%20ORM-6C3483" alt="Drizzle ORM"/>
+  <img src="https://img.shields.io/badge/Auth-Passport.js-34E27A?logo=passport" alt="Passport.js"/>  
   <img src="https://img.shields.io/badge/Deployment-Docker-blue?logo=docker" alt="Docker"/> 
   <img src="https://img.shields.io/badge/Hosting-Heroku%2FAWS%2FDigitalOcean-430098" alt="Heroku / AWS / DigitalOcean"/> 
 </p>
