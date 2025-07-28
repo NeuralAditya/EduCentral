@@ -142,7 +142,7 @@ This project is **dual-licensed**:
 
 - **Aditya Arora** - [GitHub Link](https://github.com/NeuralAditya)
 - **Brijesh Gupta** - [Email For Commercial Use](mailto:brijesh.ml.ai@gmail.com)
-- **Aditya Dhurve** - [Contributor & Liason](mailto:aditya.dhurve@mitwpu.edu.in)
+- **Aditya Durve** - [Contributor & Liason](mailto:aditya.dhurve@mitwpu.edu.in)
 
 ---
 
